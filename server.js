@@ -8,7 +8,7 @@
 const express = require("express")
 const env = require("dotenv").config()
 const app = express()
-const static = require("./routes/static")
+const static = require("./routes/static.js")
 const expressLayouts = require("express-ejs-layouts")
 
 /* ***********************
@@ -20,8 +20,8 @@ app.set("layout", "./layouts/layout") // not at views root
 
 //Index Route
 app.get("/", function(req, res){
-res.render("index", {title: "Home"})
-})
+  res.render("index", {title: "Home"})
+});
 
 /* ***********************
  * Local Server Information
@@ -35,4 +35,4 @@ const host = process.env.HOST
  *************************/
 app.listen(port, () => {
   console.log(`app listening on ${host}:${port}`)
-})
+});
