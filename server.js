@@ -8,7 +8,7 @@
 const express = require("express")
 const env = require("dotenv").config()
 const app = express()
-const static = require("./routes/static")
+app.use(express.static("public"))
 const expressLayouts = require("express-ejs-layouts")
 
 /* ***********************
