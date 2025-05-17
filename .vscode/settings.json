@@ -1,3 +1,18 @@
 {
-    "terminal.integrated.defaultProfile.windows": null
+    "terminal.integrated.defaultProfile.windows": null,
+    "sqltools.connections": [
+        {
+            "pgOptions": {
+                "ssl": {
+                    "rejectUnauthorized": true,
+                    "requestCert": false
+                }
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "PostgreSQL",
+            "name": "render.com",
+            "connectString": "postgresql://demo456:BFRZN3ILlComWsDyR7oDgeVoCtBzLTTv@dpg-d0fujl2dbo4c73arsjt0-a.virginia-postgres.render.com/demo456_hhm9"
+        }
+    ]
 }
