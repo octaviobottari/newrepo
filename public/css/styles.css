@@ -271,22 +271,22 @@ footer {
   font-size: 1.1em;
 }
 
+.vehicle-detail {
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
 .vehicle-detail img {
   max-width: 100%;
   height: auto;
   min-height: 300px;
   display: block;
   flex: 1 1 300px;
-
-}
-.vehicle-detail {
-  text-align: center;
-    max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
 }
 
 .vehicle-info {
@@ -367,6 +367,14 @@ footer {
     height: 75px;
   }
   .vehicle-detail {
-    flex-direction: column;
+    flex-direction: row;
+    text-align: left;
+  }
+  .vehicle-detail img {
+    max-width: 50%;
+    flex: 1 1 400px;
+  }
+  .vehicle-info {
+    flex: 1 1 400px;
   }
 }
