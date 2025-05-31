@@ -1,0 +1,32 @@
+<h1><%= title %></h1>
+<%- messages() %>
+<% if (errors) { %>
+    <ul class="notice">
+        <% errors.array().forEach(error => { %>
+            <li><%= error.msg %></li>
+        <% }) %>
+    </ul>
+<% } %>
+<p>All fields are required.</p>
+<p>Password must be at least 12 characters and contain at least one uppercase letter, one lowercase letter, one number, and one special character.</p>
+<form id="registerForm" action="/account/register" method="post">
+    <label for="account_firstname">First Name:</label>
+    <input type="text" id="account_firstname" name="account_firstname" required>
+    <label for="account_lastname">Last Name:</label>
+    <input type="text" id="account_lastname" name="account_lastname" required>
+    <label for="account_email">Email Address:</label>
+    <input type="email" id="account_email" name="account_email" required placeholder="Enter a valid email address">
+    <label for="account_password">Password:</label>
+    <input type="password" id="account_password" name="account_password" 
+           required pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}"
+           title="Password must be at least 12 characters, include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character">
+    <button type="button" id="togglePassword">Show Password</button>
+    <button type="submit">Register</button>
+</form>
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        const passwordInput = document.getElementById("account_password");
+        passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+        this.textContent = passwordInput.type === "password" ? "Show Password" : "Hide Password";
+    });
+</script>

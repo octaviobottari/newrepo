@@ -60,4 +60,148 @@ invController.triggerError = async function (req, res, next) {
   throw new Error("Intentional Server Error")
 }
 
+/* ***************************
+ *  Build management view
+ * ************************** */
+invController.buildManagement = async function (req, res, next) {
+    let nav = await utilities.getNav()
+    res.render("./inventory/management", {
+        title: "Vehicle Management",
+        nav,
+        errors: null,
+        layout: "./layouts/layout"
+    })
+}
+
+/* ***************************
+ *  Build add classification view
+ * ************************** */
+invController.buildAddClassification = async function (req, res, next) {
+    let nav = await utilities.getNav()
+    res.render("inventory/add-classification", {
+        title: "Add New Classification",
+        nav,
+        errors: null,
+        layout: "./layouts/layout"
+    })
+}
+
+/* ***************************
+ *  Process add classification
+ * ************************** */
+invController.processAddClassification = async function (req, res, next) {
+    const { classification_name } = req.body
+    try {
+        const result = await invModel.addClassification(classification_name)
+        if (result) {
+            let nav = await utilities.getNav()
+            req.flash("notice", `Classification ${classification_name} added successfully.`)
+            res.redirect("/inv/")
+        } else {
+            let nav = await utilities.getNav()
+            req.flash("error", "Failed to add classification. Please try again.")
+            res.render("inventory/add-classification", {
+                title: "Add New Classification",
+                nav,
+                errors: null,
+                classification_name,
+                layout: "./layouts/layout"
+            })
+        }
+    } catch (error) {
+        let nav = await utilities.getNav()
+        req.flash("error", "Classification addition failed. Please try again.")
+        res.render("inventory/add-classification", {
+            title: "Add New Classification",
+            nav,
+            errors: null,
+            classification_name,
+            layout: "./layouts/layout"
+        })
+    }
+}
+
+/* ***************************
+ *  Build add inventory view
+ * ************************** */
+invController.buildAddInventory = async function (req, res, next) {
+    let nav = await utilities.getNav()
+    let classificationList = await utilities.buildClassificationList()
+    res.render("inventory/add-inventory", {
+        title: "Add New Inventory",
+        nav,
+        classificationList,
+        errors: null,
+        layout: "./layouts/layout"
+    })
+}
+
+/* ***************************
+ *  Process add inventory
+ * ************************** */
+invController.processAddInventory = async function (req, res, next) {
+    const { classification_id, inv_make, inv_model, inv_year, inv_description, inv_image, inv_thumbnail, inv_price, inv_miles, inv_color } = req.body
+    try {
+        const result = await invModel.addInventory(
+            classification_id,
+            inv_make,
+            inv_model,
+            inv_year,
+            inv_description,
+            inv_image,
+            inv_thumbnail,
+            inv_price,
+            inv_miles,
+            inv_color
+        )
+        if (result) {
+            let nav = await utilities.getNav()
+            req.flash("notice", `Vehicle ${inv_make} ${inv_model} added successfully.`)
+            res.redirect("/inv/")
+        } else {
+            let nav = await utilities.getNav()
+            let classificationList = await utilities.buildClassificationList(classification_id)
+            req.flash("error", "Failed to add vehicle. Please try again.")
+            res.render("inventory/add-inventory", {
+                title: "Add New Inventory",
+                nav,
+                classificationList,
+                errors: null,
+                classification_id,
+                inv_make,
+                inv_model,
+                inv_year,
+                inv_description,
+                inv_image,
+                inv_thumbnail,
+                inv_price,
+                inv_miles,
+                inv_color,
+                layout: "./layouts/layout"
+            })
+        }
+    } catch (error) {
+        let nav = await utilities.getNav()
+        let classificationList = await utilities.buildClassificationList(classification_id)
+        req.flash("error", "Vehicle addition failed. Please try again.")
+        res.render("inventory/add-inventory", {
+            title: "Add New Inventory",
+            nav,
+            classificationList,
+            errors: null,
+            classification_id,
+            inv_make,
+            inv_model,
+            inv_year,
+            inv_description,
+            inv_image,
+            inv_thumbnail,
+            inv_price,
+            inv_miles,
+            inv_color,
+            layout: "./layouts/layout"
+        })
+    }
+}
+
 module.exports = invController
