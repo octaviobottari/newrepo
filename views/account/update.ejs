@@ -1,0 +1,71 @@
+<h1><%= title %></h1>
+<%- messages() %>
+<% if (errors) { %>
+    <ul class="notice" aria-live="polite">
+        <% errors.array().forEach(error => { %>
+            <li><%= error.msg %></li>
+        <% }) %>
+    </ul>
+<% } %>
+
+<h2>Account Update</h2>
+<form id="accountUpdateForm" action="/account/update/<%= account_id %>" method="post" aria-label="Account update form">
+    <input type="hidden" name="account_id" value="<%= account_id %>">
+    <label for="account_firstname">First Name:</label>
+    <input
+        type="text"
+        id="account_firstname"
+        name="account_firstname"
+        required
+        value="<%= locals.account_firstname || '' %>"
+        aria-required="true"
+        placeholder="Enter first name"
+    >
+    <label for="account_lastname">Last Name:</label>
+    <input
+        type="text"
+        id="account_lastname"
+        name="account_lastname"
+        required
+        value="<%= locals.account_lastname || '' %>"
+        aria-required="true"
+        placeholder="Enter last name"
+    >
+    <label for="account_email">Email Address:</label>
+    <input
+        type="email"
+        id="account_email"
+        name="account_email"
+        required
+        value="<%= locals.account_email || '' %>"
+        aria-required="true"
+        placeholder="http://valid.email@example.com"
+    >
+    <button type="submit">Update Account</button>
+</form>
+
+<h2>Change Password</h2>
+<p>Enter a new password to change your current password. Password must be at least 12 characters, including 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.</p>
+<form id="passwordChangeForm" action="/account/update-password/<%= account_id %>" method="post" aria-label="Change password form">
+    <input type="hidden" name="account_id" value="<%= account_id %>">
+    <label for="account_password">New Password:</label>
+    <input
+        type="password"
+        id="account_password"
+        name="account_password"
+        required
+        pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}"
+        title="Password must be minimum 12 characters, include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character"
+        aria-required="true"
+    >
+    <button type="button" id="togglePassword" aria-controls="account_password">Show Password</button>
+    <button type="submit">Change Password</button>
+</form>
+
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        const passwordInput = document.getElementById("account_password");
+        passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+        this.textContent = passwordInput.type === "password" ? "Show Password" : "Hide Password";
+    });
+</script>

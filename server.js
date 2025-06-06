@@ -9,7 +9,8 @@ const accountRoute = require("./routes/accountRoute")
 const { errorHandler } = require("./utilities/error")
 const session = require("express-session")
 const pool = require("./database/")
-const cookieParser = require("cookie-parser") // Add cookie-parser
+const cookieParser = require("cookie-parser")
+const utilities = require("./utilities/")
 
 // Middleware for Sessions and Flash Messages
 app.use(session({
@@ -29,7 +30,8 @@ app.use(function(req, res, next) {
 })
 
 // Cookie Parser Middleware
-app.use(cookieParser(process.env.SESSION_SECRET)) // Use same secret for signing cookies
+app.use(cookieParser())
+app.use(utilities.checkJWTToken)
 
 // Body Parser Middleware
 app.use(bodyParser.json())

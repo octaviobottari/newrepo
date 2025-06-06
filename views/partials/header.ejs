@@ -1,13 +1,19 @@
 <div aria-label="CSE Motors main container" class="container" role="main">
-
     <header class="header-content" aria-label="Site header">
         <h1>CSE Motors</h1>
         <ul class="account-links" aria-label="Account navigation">
-            <% if (locals.user) { %>
-                <li><a href="/account/logout" class="account-link">Logout (<%= user.account_email %>)</a></li>
+            <% if (locals.loggedin && locals.user) { %>
+                <li><a href="/account/" class="account-link" title="Go to account management">Welcome <%user.account_firstname %></a></li>  
+                <!-- 
+ I don't know why it's nnot showing the account_firstname.
+-->
+                <li><a href="/account/logout" class="account-link" title="Log out of your account">Logout</a></li>
             <% } else { %>
-                <li><a href="/account/login" class="account-link">Login</a></li>
-                <li><a href="/account/register" class="account-link">Register</a></li>
+                <li><a href="/account/login" class="account-link" title="Log in to your account">Login</a></li>
+                <li><a href="/account/register" class="account-link" title="Register a new account">Register</a></li>
             <% } %>
         </ul>
     </header>
+
+
+  

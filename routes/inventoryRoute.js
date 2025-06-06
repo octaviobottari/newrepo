@@ -3,7 +3,7 @@ const router = new express.Router()
 const invController = require("../controllers/invController")
 const utilities = require("../utilities/")
 const validate = require("../utilities/inventory-validation")
-const accountController = require("../controllers/accountController") // Add accountController for checkJWT
+const accountController = require("../controllers/accountController")
 
 // Route to build inventory by classification view
 router.get("/type/:classificationId", utilities.handleErrors(invController.buildByClassificationId))

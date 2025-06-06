@@ -1,4 +1,6 @@
 const invModel = require("../models/inventory-model")
+const jwt = require("jsonwebtoken")
+require("dotenv").config()
 const Util = {}
 
 /* ************************
@@ -114,10 +116,57 @@ Util.buildClassificationList = async function (classification_id = null) {
 }
 
 /* ****************************************
+ * Middleware to check JWT token
+ * **************************************** */
+Util.checkJWTToken = function (req, res, next) {
+    const token = req.cookies.jwt
+    if (!token) {
+        req.user = null
+        res.locals.loggedin = false
+        res.locals.user = null
+        return next()
+    }
+    try {
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+        req.user = decoded
+        res.locals.loggedin = true
+        res.locals.user = decoded
+        next()
+    } catch (error) {
+        console.error("checkJWTToken error:", error)
+        res.clearCookie("jwt")
+        req.flash("error", "Session expired or invalid. Please log in again.")
+        res.redirect("/account/login")
+    }
+}
+
+/* ****************************************
+ * Middleware to check login status
+ * **************************************** */
+Util.checkLogin = function (req, res, next) {
+    if (res.locals.loggedin) {
+        next()
+    } else {
+        req.flash("error", "Please log in to access this page.")
+        res.redirect("/account/login")
+    }
+}
+
+/* ****************************************
+ * Middleware to check Employee or Admin
+ * **************************************** */
+Util.checkAdminOrEmployee = function (req, res, next) {
+    if (res.locals.loggedin && req.user && ['Employee', 'Admin'].includes(req.user.account_type)) {
+        next()
+    } else {
+        req.flash("error", "Access denied. Employee or Admin account required.")
+        res.redirect("/account/login")
+    }
+}
+
+/* ****************************************
  * Middleware For Handling Errors
- * Wrap other function in this for 
- * General Error Handling
- **************************************** */
+ * **************************************** */
 Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
 
 module.exports = Util
