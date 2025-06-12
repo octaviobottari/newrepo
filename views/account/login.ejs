@@ -7,8 +7,7 @@
         <% }) %>
     </ul>
 <% } %>
-<p>Email and password are required.</p>
-<p>Password must be at least 12 characters and contain at least one uppercase letter, one lowercase letter, one number, and one special character.</p>
+<p>Please enter your email and password to log in.</p>
 <form id="loginform" action="/account/login" method="post" aria-label="Login form">
     <label for="account_email">Email Address:</label>
     <input
@@ -26,8 +25,7 @@
         id="account_password"
         name="account_password"
         required
-        pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}"
-        title="Password must be at least 12 characters, include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character"
+        placeholder="Enter your password"
         aria-required="true"
     >
     <button type="button" id="togglePassword" aria-controls="account_password">Show Password</button>
