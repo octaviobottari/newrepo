@@ -32,7 +32,7 @@ Util.getNav = async function () {
     list += "</ul>"
     return list
   } catch (error) {
-    console.error("getNav error: " + error)
+    console.error("getNav error: " + error.stack)
     return "<ul><li><a href='/' title='Home page'>Home</a></li></ul>"
   }
 }
@@ -133,7 +133,7 @@ Util.checkJWTToken = function (req, res, next) {
         res.locals.user = decoded
         next()
     } catch (error) {
-        console.error("checkJWTToken error:", error)
+        console.error("checkJWTToken error:", error.stack)
         res.clearCookie("jwt")
         req.flash("error", "Session expired or invalid. Please log in again.")
         res.redirect("/account/login")
@@ -168,5 +168,17 @@ Util.checkAdminOrEmployee = function (req, res, next) {
  * Middleware For Handling Errors
  * **************************************** */
 Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
+
+/* ****************************************
+ * Get maintenance status by ID
+ * **************************************** */
+Util.getMaintenanceStatusById = async function (inv_id) {
+    try {
+      return await invModel.getMaintenanceStatusById(inv_id)
+    } catch (error) {
+      console.error("getMaintenanceStatusById error:", error.stack)
+      return { status: "Operational", updated_at: null }
+    }
+}
 
 module.exports = Util

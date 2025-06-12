@@ -1,10 +1,11 @@
-
 const utilities = require("./index")
 const { body, validationResult } = require("express-validator")
+const invModel = require("../models/inventory-model")
+
 const validate = {}
 
-/*  **********************************
- *  Classification Data Validation Rules
+/* **********************************
+ * Classification Data Validation Rules
  * ********************************* */
 validate.classificationRules = () => {
     return [
@@ -18,12 +19,11 @@ validate.classificationRules = () => {
 }
 
 /* ******************************
- * Check classification data and return errors or continue
+ * Check classification data
  * ***************************** */
 validate.checkClassificationData = async (req, res, next) => {
     const { classification_name } = req.body
-    let errors = []
-    errors = validationResult(req)
+    const errors = validationResult(req)
     if (!errors.isEmpty()) {
         let nav = await utilities.getNav()
         res.render("inventory/add-classification", {
@@ -38,8 +38,8 @@ validate.checkClassificationData = async (req, res, next) => {
     next()
 }
 
-/*  **********************************
- *  Inventory Data Validation Rules
+/* **********************************
+ * Inventory Data Validation Rules
  * ********************************* */
 validate.inventoryRules = () => {
     return [
@@ -83,12 +83,11 @@ validate.inventoryRules = () => {
 }
 
 /* ******************************
- * Check inventory data and return errors or continue
+ * Check inventory data
  * ***************************** */
 validate.checkInventoryData = async (req, res, next) => {
     const { classification_id, inv_make, inv_model, inv_year, inv_description, inv_image, inv_thumbnail, inv_price, inv_miles, inv_color } = req.body
-    let errors = []
-    errors = validationResult(req)
+    const errors = validationResult(req)
     if (!errors.isEmpty()) {
         let nav = await utilities.getNav()
         let classificationList = await utilities.buildClassificationList(classification_id)
@@ -110,6 +109,52 @@ validate.checkInventoryData = async (req, res, next) => {
             layout: "./layouts/layout"
         })
         return
+    }
+    next()
+}
+
+/* ******************************
+ * Maintenance Status Validation Rules
+ * ***************************** */
+validate.maintenanceRules = () => {
+    return [
+        body("inv_id")
+            .isInt({ min: 1 })
+            .withMessage("Invalid vehicle ID."),
+        body("maintenance_status")
+            .trim()
+            .notEmpty()
+            .withMessage("Maintenance status is required.")
+            .isString()
+            .withMessage("Maintenance status must be a string.")
+            .isIn(["Needs Maintenance", "Maintenance Completed"])
+            .withMessage("Invalid maintenance status selected.")
+    ]
+}
+
+/* ******************************
+ * Check Maintenance Status Data
+ * ***************************** */
+validate.checkMaintenanceData = async (req, res, next) => {
+    const { inv_id, maintenance_status } = req.body
+    console.log("Maintenance data received:", { inv_id: inv_id, maintenance_status: maintenance_status })
+    const errors = await validationResult(req)
+    if (!errors.isEmpty()) {
+        const data = await invModel.getVehicleById(inv_id)
+        const vehicle = data[0]
+        const nav = await utilities.getNav()
+        const detail = await utilities.buildVehicleDetail(data)
+        const status = await utilities.getMaintenanceStatusById(inv_id)
+        req.flash("error", errors.array().map(err => err.msg).join(", "))
+        return res.render("inventory/detail", {
+            title: vehicle ? `${vehicle.inv_make} ${vehicle.inv_model}` : "Vehicle Not Found",
+            nav,
+            detail,
+            status,
+            errors,
+            inv_id,
+            layout: "./layouts/layout"
+        })
     }
     next()
 }

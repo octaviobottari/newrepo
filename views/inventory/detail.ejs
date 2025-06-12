@@ -1,9 +1,47 @@
-
-  <main>
+<main>
     <% if (title) { %>
-      <h1><%= title %></h1>
+        <h1><%= title %></h1>
+        <%- messages() %>
+        <% if (locals.errors && locals.errors.array().length > 0) { %>
+            <ul class="notice" aria-live="polite">
+                <% locals.errors.array().forEach(error => { %>
+                    <li><%= error.msg %></li>
+                <% }) %>
+            </ul>
+        <% } %>
+        <%- detail %>
+        <div class="maintenance-info">
+            <h2>Maintenance Status</h2>
+            <p><strong>Status:</strong> <%= status.status || 'Operational' %></p>
+            <p><strong>Last Updated:</strong> <%= status.updated_at ? new Date(status.updated_at).toLocaleString() : 'Never' %></p>
+            <% if (locals.loggedin && locals.user && ['Employee', 'Admin'].includes(locals.user.account_type)) { %>
+                <h2>Update Maintenance Status</h2>
+                <form action="/inv/maintenance" method="post" aria-label="Update maintenance status">
+                    <input type="hidden" name="inv_id" value="<%= inv_id %>">
+                    <label for="maintenance_status">Select Status:</label>
+                    <select id="maintenance_status" name="maintenance_status" required>
+                        <option value="">Choose a status</option>
+                        <option value="Needs Maintenance" <%= status.status === 'Needs Maintenance' ? 'selected' : '' %>>Needs Maintenance</option>
+                        <option value="Maintenance Completed" <%= status.status === 'Maintenance Completed' ? 'selected' : '' %>>Maintenance Completed</option>
+                    </select>
+                    <button type="submit">Update Status</button>
+                </form>
+            <% } %>
+        </div>
     <% } else { %>
-      <% res.redirect('/') %>
+        <% res.redirect('/') %>
     <% } %>
-    <%- detail %>
-  </main>
+</main>
+<style>
+    .maintenance-info {
+        margin: 20px 0;
+    }
+    form {
+        display: flex;
+        flex-direction: column;
+        max-width: 300px;
+    }
+    select, button {
+        margin: 10px 0;
+    }
+</style>
