@@ -10,7 +10,7 @@ validate.registrationRules = () => {
     return [
         body("account_firstname")
             .trim()
-            .isLength({ min: 1 })
+        .isLength({ min: 1 })
             .withMessage("Please provide a first name."),
         body("account_lastname")
             .trim()
@@ -147,10 +147,11 @@ validate.checkRegData = async (req, res, next) => {
  * Check login data
  * ***************************** */
 validate.checkLoginData = async (req, res, next) => {
-    const { account_email } = req.body
+    const { account_email, account_password } = req.body
     let errors = []
     errors = validationResult(req)
     if (!errors.isEmpty()) {
+        console.log("Validation errors:", errors.array())
         let nav = await utilities.getNav()
         res.render("account/login", {
             errors,
@@ -161,6 +162,7 @@ validate.checkLoginData = async (req, res, next) => {
         })
         return
     }
+    console.log("Login validation passed for:", account_email)
     next()
 }
 

@@ -22,9 +22,12 @@ async function buildLogin(req, res, next) {
  * ************************** */
 async function accountLogin(req, res, next) {
     const { account_email, account_password } = req.body
+    console.log("Login attempt for:", account_email)
     try {
         const account = await accountModel.checkAccountEmail(account_email)
+        console.log("Account found:", account ? account.account_id : null)
         if (!account) {
+            console.log("No account found for:", account_email)
             let nav = await utilities.getNav()
             req.flash("error", "Invalid email or password.")
             return res.render("account/login", {
@@ -35,8 +38,11 @@ async function accountLogin(req, res, next) {
                 layout: "./layouts/layout"
             })
         }
+        console.log("Comparing password for:", account_email, "Input:", account_password, "Stored hash:", account.account_password)
         const isValid = await bcrypt.compare(account_password, account.account_password)
+        console.log("Password valid:", isValid)
         if (!isValid) {
+            console.log("Invalid password for:", account_email)
             let nav = await utilities.getNav()
             req.flash("error", "Invalid email or password.")
             return res.render("account/login", {
@@ -54,17 +60,19 @@ async function accountLogin(req, res, next) {
             account_type: account.account_type,
             account_firstname: account.account_firstname
         }
+        console.log("Generating JWT for:", account_email)
         const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" })
         res.cookie("jwt", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production" ? true : false,
+            secure: process.env.NODE_ENV === "production",
             maxAge: 3600000,
             sameSite: "Strict"
         })
+        console.log("JWT cookie set for:", account_email)
         req.flash("notice", "Login successful!")
         res.redirect("/account/")
     } catch (error) {
-        console.error("accountLogin error:", error)
+        console.error("accountLogin error:", error.stack)
         req.flash("error", "Login failed. Please try again.")
         let nav = await utilities.getNav()
         res.render("account/login", {
@@ -119,7 +127,7 @@ async function processRegister(req, res, next) {
             })
         }
     } catch (error) {
-        console.error("processRegister error:", error)
+        console.error("processRegister error:", error.stack)
         req.flash("error", "Registration error. Please try again.")
         res.status(501).render("account/register", {
             title: "Register",
@@ -142,7 +150,7 @@ async function processLogout(req, res, next) {
         req.flash("notice", "You have been logged out.")
         res.redirect("/")
     } catch (error) {
-        console.error("processLogout error:", error)
+        console.error("processLogout error:", error.stack)
         req.flash("error", "Logout failed. Please try again.")
         res.redirect("/account/")
     }
@@ -188,7 +196,7 @@ async function buildUpdate(req, res, next) {
             layout: "./layouts/layout"
         })
     } catch (error) {
-        console.error("buildUpdate error:", error)
+        console.error("buildUpdate error:", error.stack)
         next(error)
     }
 }
@@ -216,7 +224,7 @@ async function processAccountUpdate(req, res, next) {
             const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" })
             res.cookie("jwt", token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production" ? true : false,
+                secure: process.env.NODE_ENV === "production",
                 maxAge: 3600000,
                 sameSite: "Strict"
             })
@@ -226,7 +234,7 @@ async function processAccountUpdate(req, res, next) {
             throw new Error("Update failed")
         }
     } catch (error) {
-        console.error("processAccountUpdate error:", error)
+        console.error("processAccountUpdate error:", error.stack)
         let nav = await utilities.getNav()
         req.flash("error", "Failed to update account. Please try again.")
         res.render("account/update", {
@@ -262,7 +270,7 @@ async function processPasswordUpdate(req, res, next) {
             throw new Error("Password update failed")
         }
     } catch (error) {
-        console.error("processPasswordUpdate error:", error)
+        console.error("processPasswordUpdate error:", error.stack)
         let nav = await utilities.getNav()
         req.flash("error", "Failed to update password. Please try again.")
         res.render("account/update", {
@@ -296,7 +304,7 @@ function checkJWT(req, res, next) {
         res.locals.user = decoded
         next()
     } catch (error) {
-        console.error("checkJWT error:", error)
+        console.error("checkJWT error:", error.stack)
         res.clearCookie("jwt")
         req.flash("error", "Session expired or invalid. Please log in again.")
         res.redirect("/account/login")

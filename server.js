@@ -17,11 +17,18 @@ app.use(session({
     store: new (require('connect-pg-simple')(session))({
         createTableIfMissing: true,
         pool,
+        tableName: "session"
     }),
     secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
-    name: 'sessionId'
+    resave: false,
+    saveUninitialized: false,
+    name: 'sessionId',
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 3600000,
+        sameSite: "strict"
+    }
 }))
 app.use(require('connect-flash')())
 app.use(function(req, res, next) {
@@ -57,5 +64,5 @@ const host = process.env.HOST || "localhost"
 
 // Log statement to confirm server operation
 app.listen(port, () => {
-  console.log(`app listening on ${host}:${port}`)
+    console.log(`app listening on ${host}:${port}`)
 })
